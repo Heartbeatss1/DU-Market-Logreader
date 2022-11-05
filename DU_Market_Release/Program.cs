@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Runtime.Remoting.Contexts;
 using System.Security.Cryptography;
 using System.Security.Policy;
@@ -35,6 +36,17 @@ namespace DU_Market_Release
         static void Main(string[] args)
         {
             //Check for Updates
+
+            Assembly execAssembly = Assembly.GetCallingAssembly();
+
+            AssemblyName name = execAssembly.GetName();
+
+            Console.WriteLine(string.Format("{0}{1} {2:0}.{3:0}",
+                Environment.NewLine,
+                name.Name,
+                name.Version.Major.ToString(),
+                name.Version.Minor.ToString()
+                ));
 
 
             Program foo = new Program();
@@ -160,12 +172,12 @@ namespace DU_Market_Release
         }
 #else
         {
-            UrlMarketstring = "https://du-market.net/marketapi/newdata";
-            Urlaverage = "https://du-market.net/marketapi/newaverage";
-        }
+                UrlMarketstring = "https://api.du-market.net/marketapi/newdata";
+                Urlaverage = "https://api.du-market.net/marketapi/newaverage";
+            }
 #endif
-
-
+            Console.WriteLine(UrlMarketstring);
+            Console.WriteLine(Urlaverage);
 
             var wh = new AutoResetEvent(false);
             string exitphrase = "<message>Close \"dxgi.dll\"</message>";
@@ -312,6 +324,7 @@ namespace DU_Market_Release
                                             if (!result.IsSuccessStatusCode)
                                             {
                                                 Console.WriteLine(result.StatusCode);
+                                                Console.WriteLine(result);
                                             }
 
                                         }
