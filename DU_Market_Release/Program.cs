@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -215,8 +216,8 @@ namespace DU_Market_Release
                                 string[] orders;
                                 orders = cutstringe.Split(new string[] { "MarketOrder:" }, StringSplitOptions.None);
 
-                                List<string> numberssell = new List<string>();
-                                List<string> numbersbuy = new List<string>();
+                                List<double> numberssell = new List<double>();
+                                List<double> numbersbuy = new List<double>();
                                 Decimal maxbuyPrice = 0;
                                 Decimal maxsellPrice = 0;
                                 Decimal minbuyPrice = 0;
@@ -278,7 +279,7 @@ namespace DU_Market_Release
                                         {
                                             if(marketData.price > 10)
                                             {
-                                                numbersbuy.Add(price3);
+                                                numbersbuy.Add(Convert.ToDouble(price3, System.Globalization.CultureInfo.InvariantCulture));
                                             }
                                             
                                             if(marketData.price > maxbuyPrice)
@@ -294,7 +295,7 @@ namespace DU_Market_Release
                                         {
                                             if (marketData.price > 10)
                                             {
-                                                numberssell.Add(price3);
+                                                numberssell.Add(Convert.ToDouble(price3, System.Globalization.CultureInfo.InvariantCulture));
                                             }
                                             if(marketData.price > maxsellPrice)
                                             {
@@ -309,7 +310,7 @@ namespace DU_Market_Release
                                         marketData.date = DateTime.Now;
                                         avitemtyp = marketData.itemtyp;
 
-                                        if (marketData.expirationDate < DateTime.Now)
+                                        if (marketData.expirationDate < DateTime.Now || marketData.price <= 5)
                                         { }
                                         else
                                         {
@@ -342,7 +343,8 @@ namespace DU_Market_Release
                                 Average.maxsellPrice = maxsellPrice;
                                 if(numbersbuy.Count != 0)
                                 {
-                                    Average.averagebuyPrice = Convert.ToDecimal(numbersbuy.Average(num => decimal.Parse(num)));
+                                    double tempbuy = numbersbuy.Average();
+                                    Average.averagebuyPrice = Convert.ToDecimal(tempbuy);
                                 }
                                 else
                                 {
@@ -350,7 +352,8 @@ namespace DU_Market_Release
                                 }
                                 if(numberssell.Count != 0)
                                 {
-                                    Average.averagesellPrice = Convert.ToDecimal(numberssell.Average(num => decimal.Parse(num)));
+                                    double tempsell = numberssell.Average();
+                                    Average.averagesellPrice = Convert.ToDecimal(tempsell);
                                 }
                                 else
                                 {
@@ -423,7 +426,7 @@ namespace DU_Market_Release
             const string userInfoEndpoint = "https://discordapp.com/api/users/@me";
 
             // Creates a redirect URI using an available port on the loopback address.
-            string redirectURI = string.Format("http://{0}:{1}/", IPAddress.Loopback, 58224);
+            string redirectURI = string.Format("http://{0}:{1}/", IPAddress.Loopback, 5224);
             Console.WriteLine("redirect URI: " + redirectURI);
 
             // Creates an HttpListener to listen for requests on that redirect URI.
