@@ -25,6 +25,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using static System.Net.WebRequestMethods;
 using File = System.IO.File;
+using Octokit;
+using FileMode = System.IO.FileMode;
 
 namespace DU_Market_Release
 {
@@ -50,22 +52,69 @@ namespace DU_Market_Release
             string url1 = configuration["ConnectionStrings:UrlMarketstring"];
             string url2 = configuration["ConnectionStrings:Urlaverage"];
 
-            //Check for Updates
 
             Assembly execAssembly = Assembly.GetCallingAssembly();
-
             AssemblyName name = execAssembly.GetName();
-
             Console.WriteLine(string.Format("{0}{1} {2:0}.{3:0}",
                 Environment.NewLine,
                 name.Name,
                 name.Version.Major.ToString(),
                 name.Version.Minor.ToString()
                 ));
+            string localvers = name.Version.Major.ToString() + "." + name.Version.Minor.ToString() + "." + name.Version.MinorRevision.ToString();
+
+            //Check for Updates
+            Program foo2 = new Program();
+            foo2.CompareVersions(localvers);
+
+           Program foo = new Program();
+            //foo.ProStart(clientID, clientSecret, url1, url2);
+            Console.ReadLine();
+        }
+
+        public async void CompareVersions(string localvers)
+        {
+
+            string testname = await CheckForLatestVersion();
+            Console.WriteLine(localvers);
+            Console.WriteLine(testname);
+
+            var version1 = new Version(localvers);
+            var version2 = new Version(testname);
+            var verscomp = version1.CompareTo(version2);
+            if (verscomp < 0)
+            {
+                string releaseurl = "https://github.com/Heartbeatss1/DU-Market-Logreader/releases/tag/" + testname;
+                Console.WriteLine("Version is Outdated");
+                Console.WriteLine("Download the latest Version from Github");
+                System.Diagnostics.Process.Start(releaseurl);
+                Console.ReadLine();
+                System.Threading.Thread.Sleep(1000);
+                System.Environment.Exit(1);
+               
+                
+            }
+            else
+            {
+                Console.WriteLine("Version Match");
+            }
+        }
+
+        public async Task<string> CheckForLatestVersion()
+        {
+            //chheckk GitHub Version
+            var client = new GitHubClient(new Octokit.ProductHeaderValue("Du-LogReader-Helper"));
+
+            var releases = await client.Repository.Release.GetAll("Heartbeatss1", "DU-Market-Logreader");
+            var latest = releases[0];
+            Console.WriteLine(
+                "The latest release is tagged at {0} and is named {1}",
+                latest.TagName,
+                latest.Name);
 
 
-            Program foo = new Program();
-            foo.ProStart(clientID, clientSecret, url1, url2);
+            return latest.TagName;
+
         }
         public void ProStart(string clientID, string clientSecret, string url1, string url2)
         { 
@@ -409,24 +458,6 @@ namespace DU_Market_Release
 
         }
     
-
-    /*
-    public static Task<string> MarketSendApiAsync(string sendtoapi)
-    {
-        Console.WriteLine("api");
-        //Console.WriteLine(sendtoapi);
-
-        var httpClient = new HttpClient();
-        var client = new swaggerClient("https://api.du-market.net", httpClient);
-        //var client = new swaggerClient("https://localhost:7250/", httpClient);
-
-        client.SetAsync(sendtoapi);
-        Console.WriteLine(sendtoapi);
-
-        return Task.FromResult("ok");
-
-    }
-    */
         public async void Discord_login_data(string clientID, string clientSecret)
         {
             // Generates state and PKCE values.

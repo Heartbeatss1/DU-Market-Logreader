@@ -27,8 +27,8 @@
     <ProductName>DU-Market.net LogReader</ProductName>
     <PublisherName>Matthias Müller</PublisherName>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>15</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -38,12 +38,14 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -164,6 +166,9 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Octokit, Version=4.0.1.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
+      <HintPath>..\packages\Octokit.4.0.1\lib\netstandard2.0\Octokit.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
