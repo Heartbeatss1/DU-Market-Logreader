@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using DU_Market_Release.Properties;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -18,15 +20,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using static System.Net.WebRequestMethods;
+using File = System.IO.File;
 
 namespace DU_Market_Release
 {
     public class Program
     {
-
         public string curFile = "./config.xml";
-        const string clientID = "1030935706538868746";
-        const string clientSecret = "2CO0n3sHnNuDkkKBhikUfcllf0Nqaleq";
         const string authorizationEndpoint = "https://discord.com/api/oauth2/authorize";
         const string tokenEndpoint = "https://discord.com/api/oauth2/token";
         const string userInfoEndpoint = "https://discordapp.com/api/users/@me";
@@ -36,6 +40,16 @@ namespace DU_Market_Release
 
         static void Main(string[] args)
         {
+            var builder = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json");
+            var configuration = builder.Build();
+
+            string clientID = configuration["Discord:clientID"];
+            string clientSecret = configuration["Discord:clientSecret"];
+            string url1 = configuration["ConnectionStrings:UrlMarketstring"];
+            string url2 = configuration["ConnectionStrings:Urlaverage"];
+
             //Check for Updates
 
             Assembly execAssembly = Assembly.GetCallingAssembly();
@@ -51,15 +65,15 @@ namespace DU_Market_Release
 
 
             Program foo = new Program();
-            foo.ProStart();
+            foo.ProStart(clientID, clientSecret, url1, url2);
         }
-        public void ProStart()
+        public void ProStart(string clientID, string clientSecret, string url1, string url2)
         { 
 
 
             if (!File.Exists(curFile))
             {
-                Discord_login_data();
+                Discord_login_data(clientID, clientSecret);
 
                 while (new_access_token == "")
                 {
@@ -90,7 +104,7 @@ namespace DU_Market_Release
                 if (DateTime.Compare(DateTime.Now, xmlexpire) > 0)
                 {
 
-                    Discord_login_data();
+                    Discord_login_data(clientID, clientSecret);
                     while (new_access_token == "")
                     {
                         Console.WriteLine("Warte auf Discord Login");
@@ -131,7 +145,7 @@ namespace DU_Market_Release
                 string[] paths = { path, logpath };
                 string fullpath = Path.Combine(paths);
                 Console.WriteLine(logpath);
-                ProcessFile(fullpath, new_access_token);
+                ProcessFile(fullpath, new_access_token, url1, url2);
                 durun = false;
                 }
 
@@ -160,21 +174,21 @@ namespace DU_Market_Release
             var file = new DirectoryInfo(path).GetFiles().OrderByDescending(o => o.LastWriteTime).FirstOrDefault();
             return file.Name;
         }
-        public static async void ProcessFile(string fullPath, string access_token)
+        public static async void ProcessFile(string fullPath, string access_token, string url1, string url2)
         {
 
         string UrlMarketstring = "";
         string Urlaverage = "";
 
-        #if DEBUG
+#if debug
         {
             UrlMarketstring = "https://localhost:7153/marketapi/newdata";
                 Urlaverage = "https://localhost:7153/marketapi/newaverage";
         }
 #else
         {
-                UrlMarketstring = "https://api.du-market.net/marketapi/newdata";
-                Urlaverage = "https://api.du-market.net/marketapi/newaverage";
+                UrlMarketstring = url1;
+                Urlaverage = url2;
             }
 #endif
             Console.WriteLine(UrlMarketstring);
@@ -413,7 +427,7 @@ namespace DU_Market_Release
 
     }
     */
-        public async void Discord_login_data()
+        public async void Discord_login_data(string clientID, string clientSecret)
         {
             // Generates state and PKCE values.
             string state = randomDataBase64url(32);
@@ -439,7 +453,7 @@ namespace DU_Market_Release
             string authorizationRequest = string.Format("{0}?client_id={2}&redirect_uri={1}&response_type=code&scope=guilds%20identify%20guilds.members.read",
                         authorizationEndpoint,
                         System.Uri.EscapeDataString(redirectURI),
-                        clientID,
+                        //clientID,
                         state,
                         code_challenge,
                         code_challenge_method);
@@ -486,12 +500,12 @@ namespace DU_Market_Release
             }*/
             Console.WriteLine("Authorization code: " + code);
             // Starts the code exchange at the Token Endpoint.
-            performCodeExchange(code, code_verifier, redirectURI);
+            performCodeExchange(code, code_verifier, redirectURI, clientID, clientSecret);
             return;
 
         }
 
-        async void performCodeExchange(string code, string code_verifier, string redirectURI)
+        async void performCodeExchange(string code, string code_verifier, string redirectURI, string clientID, string clientSecret)
         {
             Console.WriteLine("Exchanging code for tokens...");
 
