@@ -55,29 +55,20 @@ namespace DU_Market_Release
 
             Assembly execAssembly = Assembly.GetCallingAssembly();
             AssemblyName name = execAssembly.GetName();
-            Console.WriteLine(string.Format("{0}{1} {2:0}.{3:0}",
-                Environment.NewLine,
-                name.Name,
-                name.Version.Major.ToString(),
-                name.Version.Minor.ToString()
-                ));
             string localvers = name.Version.Major.ToString() + "." + name.Version.Minor.ToString() + "." + name.Version.MinorRevision.ToString();
 
             //Check for Updates
             Program foo2 = new Program();
             foo2.CompareVersions(localvers);
 
-           Program foo = new Program();
-            //foo.ProStart(clientID, clientSecret, url1, url2);
-            Console.ReadLine();
+            Program foo = new Program();
+            foo.ProStart(clientID, clientSecret, url1, url2);
         }
 
         public async void CompareVersions(string localvers)
         {
 
             string testname = await CheckForLatestVersion();
-            Console.WriteLine(localvers);
-            Console.WriteLine(testname);
 
             var version1 = new Version(localvers);
             var version2 = new Version(testname);
@@ -96,7 +87,6 @@ namespace DU_Market_Release
             }
             else
             {
-                Console.WriteLine("Version Match");
             }
         }
 
@@ -107,11 +97,6 @@ namespace DU_Market_Release
 
             var releases = await client.Repository.Release.GetAll("Heartbeatss1", "DU-Market-Logreader");
             var latest = releases[0];
-            Console.WriteLine(
-                "The latest release is tagged at {0} and is named {1}",
-                latest.TagName,
-                latest.Name);
-
 
             return latest.TagName;
 
@@ -240,8 +225,6 @@ namespace DU_Market_Release
                 Urlaverage = url2;
             }
 #endif
-            Console.WriteLine(UrlMarketstring);
-            Console.WriteLine(Urlaverage);
 
             var wh = new AutoResetEvent(false);
             string exitphrase = "<message>Close \"dxgi.dll\"</message>";
@@ -460,6 +443,7 @@ namespace DU_Market_Release
     
         public async void Discord_login_data(string clientID, string clientSecret)
         {
+
             // Generates state and PKCE values.
             string state = randomDataBase64url(32);
             string code_verifier = randomDataBase64url(32);
@@ -484,7 +468,7 @@ namespace DU_Market_Release
             string authorizationRequest = string.Format("{0}?client_id={2}&redirect_uri={1}&response_type=code&scope=guilds%20identify%20guilds.members.read",
                         authorizationEndpoint,
                         System.Uri.EscapeDataString(redirectURI),
-                        //clientID,
+                        clientID,
                         state,
                         code_challenge,
                         code_challenge_method);
