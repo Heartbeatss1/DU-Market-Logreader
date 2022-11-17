@@ -20,6 +20,7 @@ namespace DU_Market_Release
         public DateTime updatedate { get; set; }
         public decimal price { get; set; }
         public DateTime date { get; set; }
+        public string userid { get; set; }
 
     }
     public class jksonMarketString
@@ -53,6 +54,7 @@ namespace DU_Market_Release
         public decimal maxbuyPrice { get; set; }
         public decimal minbuyPrice { get; set; }
         public DateTime Actdate { get; set; }
+        public string userid { get; set; }
 
     }
 }

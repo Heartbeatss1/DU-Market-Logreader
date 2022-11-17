@@ -42,6 +42,11 @@ namespace DU_Market_Release
 
         static void Main(string[] args)
         {
+            
+            var culture = CultureInfo.GetCultureInfo("de-DE");
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+
             var builder = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json");
@@ -63,6 +68,7 @@ namespace DU_Market_Release
 
             Program foo = new Program();
             foo.ProStart(clientID, clientSecret, url1, url2);
+            Console.ReadLine();
         }
 
         public async void CompareVersions(string localvers)
@@ -178,7 +184,7 @@ namespace DU_Market_Release
                 string logpath = GetLatestLog(path);
                 string[] paths = { path, logpath };
                 string fullpath = Path.Combine(paths);
-                Console.WriteLine(logpath);
+                //Console.WriteLine(logpath);
                 ProcessFile(fullpath, new_access_token, url1, url2);
                 durun = false;
                 }
@@ -214,7 +220,7 @@ namespace DU_Market_Release
         string UrlMarketstring = "";
         string Urlaverage = "";
 
-#if debug
+#if DEBUG
         {
             UrlMarketstring = "https://localhost:7153/marketapi/newdata";
                 Urlaverage = "https://localhost:7153/marketapi/newaverage";
@@ -353,6 +359,7 @@ namespace DU_Market_Release
                                             }
                                         }
 
+                                        marketData.userid = access_token;
                                         marketData.date = DateTime.Now;
                                         avitemtyp = marketData.itemtyp;
 
@@ -387,7 +394,8 @@ namespace DU_Market_Release
                                 Average.maxbuyPrice = maxbuyPrice;
                                 Average.minsellPrice = minsellPrice;
                                 Average.maxsellPrice = maxsellPrice;
-                                if(numbersbuy.Count != 0)
+                                Average.userid = access_token;
+                                if (numbersbuy.Count != 0)
                                 {
                                     double tempbuy = numbersbuy.Average();
                                     Average.averagebuyPrice = Convert.ToDecimal(tempbuy);
@@ -456,7 +464,7 @@ namespace DU_Market_Release
 
             // Creates a redirect URI using an available port on the loopback address.
             string redirectURI = string.Format("http://{0}:{1}/", IPAddress.Loopback, 5224);
-            Console.WriteLine("redirect URI: " + redirectURI);
+            //Console.WriteLine("redirect URI: " + redirectURI);
 
             // Creates an HttpListener to listen for requests on that redirect URI.
             var http = new HttpListener();
@@ -465,7 +473,7 @@ namespace DU_Market_Release
             http.Start();
 
             // Creates the OAuth 2.0 authorization request.
-            string authorizationRequest = string.Format("{0}?client_id={2}&redirect_uri={1}&response_type=code&scope=guilds%20identify%20guilds.members.read",
+            string authorizationRequest = string.Format("{0}?client_id={2}&redirect_uri={1}&response_type=code&scope=identify",
                         authorizationEndpoint,
                         System.Uri.EscapeDataString(redirectURI),
                         clientID,
@@ -513,7 +521,7 @@ namespace DU_Market_Release
                 output(String.Format("Received request with invalid state ({0})", incoming_state));
                 return;
             }*/
-            Console.WriteLine("Authorization code: " + code);
+            //Console.WriteLine("Authorization code: " + code);
             // Starts the code exchange at the Token Endpoint.
             performCodeExchange(code, code_verifier, redirectURI, clientID, clientSecret);
             return;
